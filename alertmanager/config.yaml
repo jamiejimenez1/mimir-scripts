@@ -1,10 +1,5 @@
 # Alertmanager routing + receivers.
 # Deployed via: mimirtool alertmanager load alertmanager/config.yaml
-#
-# JSM webhook URL/key below is a PLACEHOLDER — replace with the real
-# integration URL from JSM (Ops > Alerts > Add integration > Webhook),
-# and store the key as a CI secret rather than committing it directly
-# if it's sensitive.
 
 route:
   receiver: default-none
