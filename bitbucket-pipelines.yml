@@ -36,9 +36,3 @@ pipelines:
     staging:
       - step: *sync-nonprod
 
-# Required repo/deployment variables (set as secured variables in Bitbucket):
-#   MIMIR_PROD_ADDRESS, MIMIR_PROD_TENANT_ID, MIMIR_PROD_API_KEY
-#   MIMIR_NONPROD_ADDRESS, MIMIR_NONPROD_TENANT_ID, MIMIR_NONPROD_API_KEY
-#
-# NOTE: this is a stub. As more projects are added, add a sync line per
-# project folder (or loop over folders once the pattern is proven).
