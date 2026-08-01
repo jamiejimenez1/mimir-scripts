@@ -19,7 +19,7 @@ groups:
         annotations:
           summary: "Instance {{ $labels.instance }} is down"
           description: "{{ $labels.instance }} has been unreachable for 5+ minutes."
-          runbook_url: "https://REPLACE_ME/runbooks/instance-down"
+          runbook_url: "relevant confluence page"
 
       - alert: DiskSpaceCritical
         expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
@@ -31,4 +31,4 @@ groups:
         annotations:
           summary: "Disk space below 10% on {{ $labels.instance }}"
           description: "{{ $labels.instance }} has {{ $value }}% disk space remaining."
-          runbook_url: "https://REPLACE_ME/runbooks/disk-space"
+          runbook_url: "relevant confluence page"
