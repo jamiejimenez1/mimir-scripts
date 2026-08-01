@@ -1,0 +1,39 @@
+# nb-prod1-app-egress (1 instance)
+#
+# TO VERIFY BEFORE DEPLOYING:
+#   - real metric names (cpu_usage / memory_usage are placeholders)
+#   - runbook_url / dashboard_url values (placeholders below)
+#   - team label matches your actual team naming
+
+groups:
+  - name: nb-prod1-egress-alerts
+    rules:
+      - alert: EgressHighCPU
+        expr: cpu_usage{job="nb-prod1-app-egress"} > 90
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-app-egress
+          team: egress
+          severity: P1
+        annotations:
+          summary: "CPU above 90% on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} (nb-prod1-app-egress) CPU is {{ $value }}%"
+          runbook_url: "https://REPLACE_ME/runbooks/egress-high-cpu"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/egress-overview"
+
+      - alert: EgressHighMemory
+        expr: memory_usage{job="nb-prod1-app-egress"} > 80
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-app-egress
+          team: egress
+          severity: P1
+        annotations:
+          summary: "Memory above 80% on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} (nb-prod1-app-egress) memory is {{ $value }}%"
+          runbook_url: "https://REPLACE_ME/runbooks/egress-high-memory"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/egress-overview"

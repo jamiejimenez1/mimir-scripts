@@ -1,0 +1,44 @@
+image: alpine:3.20
+
+definitions:
+  steps:
+    - step: &sync-prod
+        name: Sync PROD rules to Mimir
+        script:
+          - apk add --no-cache curl
+          - curl -fLo mimirtool https://github.com/grafana/mimir/releases/latest/download/mimirtool-linux-amd64
+          - chmod +x mimirtool
+
+          # --- Common baseline rules ---
+          - ./mimirtool rules sync --rule-dirs=common/prod --namespace=common-prod --address=$MIMIR_PROD_ADDRESS --id=$MIMIR_PROD_TENANT_ID --key=$MIMIR_PROD_API_KEY
+
+          # --- devops-nb-sandbox-180925 ---
+          - ./mimirtool rules sync --rule-dirs=devops-nb-sandbox-180925/prod1 --namespace=devops-nb-sandbox-180925-prod1 --address=$MIMIR_PROD_ADDRESS --id=$MIMIR_PROD_TENANT_ID --key=$MIMIR_PROD_API_KEY
+
+          # --- Alertmanager config ---
+          - ./mimirtool alertmanager load alertmanager/config.yaml --address=$MIMIR_PROD_ADDRESS --id=$MIMIR_PROD_TENANT_ID --key=$MIMIR_PROD_API_KEY
+
+    - step: &sync-nonprod
+        name: Sync NONPROD rules to Mimir
+        script:
+          - apk add --no-cache curl
+          - curl -fLo mimirtool https://github.com/grafana/mimir/releases/latest/download/mimirtool-linux-amd64
+          - chmod +x mimirtool
+
+          - ./mimirtool rules sync --rule-dirs=common/nonprod --namespace=common-nonprod --address=$MIMIR_NONPROD_ADDRESS --id=$MIMIR_NONPROD_TENANT_ID --key=$MIMIR_NONPROD_API_KEY
+
+          - ./mimirtool rules sync --rule-dirs=devops-nb-sandbox-180925/nonprod --namespace=devops-nb-sandbox-180925-nonprod --address=$MIMIR_NONPROD_ADDRESS --id=$MIMIR_NONPROD_TENANT_ID --key=$MIMIR_NONPROD_API_KEY
+
+pipelines:
+  branches:
+    master:
+      - step: *sync-prod
+    staging:
+      - step: *sync-nonprod
+
+# Required repo/deployment variables (set as secured variables in Bitbucket):
+#   MIMIR_PROD_ADDRESS, MIMIR_PROD_TENANT_ID, MIMIR_PROD_API_KEY
+#   MIMIR_NONPROD_ADDRESS, MIMIR_NONPROD_TENANT_ID, MIMIR_NONPROD_API_KEY
+#
+# NOTE: this is a stub. As more projects are added, add a sync line per
+# project folder (or loop over folders once the pattern is proven).

@@ -1,0 +1,76 @@
+# nb-prod1-mq-internal (1 instance) — hosts ActiveMQ, metrics collected via Alloy.
+#
+# TO VERIFY BEFORE DEPLOYING:
+#   - real metric name for queue depth. activemq_queue_size / the "queue" label
+#     are PLACEHOLDERS. Check Grafana Explore for what Alloy's ActiveMQ
+#     integration actually exposes for job="nb-prod1-mq-internal".
+#   - real thresholds (1000 below is a placeholder, not a recommendation)
+#   - runbook_url / dashboard_url values
+#   - team label matches your actual team naming
+
+groups:
+  - name: nb-prod1-mq-internal-alerts
+    rules:
+      - alert: MQInternalHighCPU
+        expr: cpu_usage{job="nb-prod1-mq-internal"} > 90
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-mq-internal
+          team: integration
+          severity: P1
+        annotations:
+          summary: "CPU above 90% on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} (nb-prod1-mq-internal) CPU is {{ $value }}%"
+          runbook_url: "https://REPLACE_ME/runbooks/mq-high-cpu"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/mq-internal-overview"
+
+      - alert: MQInternalHighMemory
+        expr: memory_usage{job="nb-prod1-mq-internal"} > 80
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-mq-internal
+          team: integration
+          severity: P1
+        annotations:
+          summary: "Memory above 80% on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} (nb-prod1-mq-internal) memory is {{ $value }}%"
+          runbook_url: "https://REPLACE_ME/runbooks/mq-high-memory"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/mq-internal-overview"
+
+      # --- Queue depth alerts (placeholder metric + threshold — verify first) ---
+
+      - alert: TXNQueueHigh
+        expr: activemq_queue_size{job="nb-prod1-mq-internal", queue="TXN"} > 1000
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-mq-internal
+          queue: TXN
+          team: integration
+          severity: P1
+        annotations:
+          summary: "TXN queue depth above threshold on {{ $labels.instance }}"
+          description: "TXN queue depth is {{ $value }} on {{ $labels.instance }}"
+          runbook_url: "https://REPLACE_ME/runbooks/mq-queue-depth"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/mq-queues"
+
+      - alert: PUBLISHQueueHigh
+        expr: activemq_queue_size{job="nb-prod1-mq-internal", queue="PUBLISH"} > 1000
+        for: 5m
+        labels:
+          project: devops-nb-sandbox-180925
+          env: prod1
+          instance_group: nb-prod1-mq-internal
+          queue: PUBLISH
+          team: integration
+          severity: P1
+        annotations:
+          summary: "PUBLISH queue depth above threshold on {{ $labels.instance }}"
+          description: "PUBLISH queue depth is {{ $value }} on {{ $labels.instance }}"
+          runbook_url: "https://REPLACE_ME/runbooks/mq-queue-depth"
+          dashboard_url: "https://REPLACE_ME/grafana/d/REPLACE/mq-queues"

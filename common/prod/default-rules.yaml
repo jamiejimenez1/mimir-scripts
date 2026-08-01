@@ -1,0 +1,34 @@
+# Baseline rules applied to every prod project.
+#
+# TO VERIFY BEFORE DEPLOYING:
+#   - metric names (node_exporter-style names below are placeholders)
+#   - runbook_url values
+#   - whether "team" should be set here at all — common rules may need to
+#     route to a platform/on-call team rather than a service team
+
+groups:
+  - name: common-prod-alerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: P1
+          scope: common
+          team: platform
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "{{ $labels.instance }} has been unreachable for 5+ minutes."
+          runbook_url: "https://REPLACE_ME/runbooks/instance-down"
+
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: P1
+          scope: common
+          team: platform
+        annotations:
+          summary: "Disk space below 10% on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} has {{ $value }}% disk space remaining."
+          runbook_url: "https://REPLACE_ME/runbooks/disk-space"

@@ -1,0 +1,27 @@
+# Alertmanager routing + receivers.
+# Deployed via: mimirtool alertmanager load alertmanager/config.yaml
+#
+# JSM webhook URL/key below is a PLACEHOLDER — replace with the real
+# integration URL from JSM (Ops > Alerts > Add integration > Webhook),
+# and store the key as a CI secret rather than committing it directly
+# if it's sensitive.
+
+route:
+  receiver: default-none
+  group_by: ["alertname", "instance_group"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - match:
+        severity: P1
+      receiver: jsm-p1
+      continue: false
+
+receivers:
+  - name: default-none
+
+  - name: jsm-p1
+    webhook_configs:
+      - url: "https://api.atlassian.com/jsm/ops/integration/v1/REPLACE_ME"
+        send_resolved: true
